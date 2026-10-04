@@ -51,7 +51,7 @@ export async function safeSync(t) {
   catch (e) {
     await db(`transactions?id=eq.${t.id}`, {
       method:'PATCH', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({sheets_status:'Sync failed'})
+      body: JSON.stringify({sheets_status:`Sync failed: ${e.message}`})
     });
     return `Sync failed: ${e.message}`;
   }
