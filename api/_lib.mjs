@@ -28,7 +28,10 @@ export async function telegram(chatId, text) {
   const data=await r.json(); if(!data.ok) throw new Error(data.description||'Telegram delivery failed'); return data;
 }
 export async function googleToken() {
-  const email=process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, privateKey=process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY?.replace(/\\n/g,'\n');
+  const email=process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const rawKey=process.env.GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY || '';
+  const pem=rawKey.match(/-----BEGIN PRIVATE KEY-----[\s\S]*?-----END PRIVATE KEY-----/);
+  const privateKey=(pem ? pem[0] : rawKey).replace(/\\n/g,'\n').trim()+'\n';
   if(!email||!privateKey) throw new Error('Google service-account variables are not configured');
   const {createSign}=await import('node:crypto'); const b=x=>Buffer.from(x).toString('base64url'); const now=Math.floor(Date.now()/1000);
   const input=`${b(JSON.stringify({alg:'RS256',typ:'JWT'}))}.${b(JSON.stringify({iss:email,scope:'https://www.googleapis.com/auth/spreadsheets',aud:'https://oauth2.googleapis.com/token',iat:now,exp:now+3600}))}`;
