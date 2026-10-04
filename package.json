@@ -1,0 +1,7 @@
+{
+  "name": "friends-included-finance",
+  "private": true,
+  "type": "module",
+  "scripts": { "dev": "vercel dev", "test": "node --test test/*.test.mjs" },
+  "engines": { "node": ">=20" }
+}
