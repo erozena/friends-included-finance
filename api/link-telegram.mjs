@@ -10,9 +10,17 @@ export default async function (req, res) {
     }
 
     const matches = await db(
-      `employees?telegram_user_id=eq.${encodeURIComponent(body.telegramUserId)}&select=linked_chat_id`,
+      `employees?telegram_user_id=eq.${encodeURIComponent(body.telegramUserId)}&select=id,linked_chat_id`,
     );
     const chatId = matches[0]?.linked_chat_id || null;
+
+    if (matches[0] && matches[0].id !== body.employee) {
+      await db(`employees?id=eq.${matches[0].id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegram_user_id: null, linked_chat_id: null }),
+      });
+    }
 
     await db(`employees?id=eq.${body.employee}`, {
       method: 'PATCH',
